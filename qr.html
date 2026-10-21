@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DotOne QR Poster</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg: #0b0b0d;
+    --surface: #151518;
+    --border: #2a2a30;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    --gold-1: #f7d774;
+    --gold-2: #e9b949;
+    --gold-3: #c48f1f;
+    --gold-grad: linear-gradient(135deg, var(--gold-1), var(--gold-2) 50%, var(--gold-3));
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: #e7e5e4; color: #18181b;
+    font-family: "Vazirmatn", system-ui, -apple-system, "Segoe UI", sans-serif;
+    min-height: 100vh;
+  }
+  .controls {
+    max-width: 640px; margin: 0 auto; padding: 20px 16px 8px;
+    display: grid; gap: 10px;
+  }
+  .controls label { font-size: 13px; color: #52525b; }
+  .controls input {
+    width: 100%; direction: ltr; font: 14px ui-monospace, SFMono-Regular, Menlo, monospace;
+    padding: 11px 12px; border-radius: 10px; border: 1px solid #d4d4d8; background: #fff;
+  }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btns button {
+    border: 0; border-radius: 10px; padding: 10px 16px; font: inherit; font-weight: 700; font-size: 14px; cursor: pointer;
+    background: #18181b; color: #fff;
+  }
+  .btns button.alt { background: #fff; color: #18181b; border: 1px solid #d4d4d8; }
+  .warn { font-size: 13px; color: #b45309; background: #fef3c7; border-radius: 10px; padding: 10px 12px; line-height: 1.8; }
+
+  .stage { display: flex; justify-content: center; padding: 16px 16px 40px; }
+  .poster {
+    width: 100%; max-width: 520px; aspect-ratio: 1 / 1.414;
+    background:
+      radial-gradient(120% 55% at 50% 0%, rgba(233,185,73,.22), transparent 60%),
+      var(--bg);
+    color: var(--text); border-radius: 22px; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: 7% 8% 6%; text-align: center;
+    box-shadow: 0 30px 60px rgba(0,0,0,.25);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .p-logo { width: 17%; aspect-ratio: 1; border-radius: 50%; padding: 3px; background: var(--gold-grad); }
+  .p-logo img { width: 100%; height: 100%; border-radius: 50%; display: block; background: #000; }
+  .p-title { font-size: clamp(20px, 5.6vw, 30px); font-weight: 800; margin: 3% 0 1%; line-height: 1.35; }
+  .p-title .brand { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent; direction: ltr; display: inline-block; }
+  .p-sub { font-size: clamp(13px, 3.4vw, 17px); color: var(--muted); margin: 0; line-height: 1.8; }
+  .p-sub-en { font-size: clamp(11px, 2.6vw, 13px); color: #71717a; margin: 2px 0 0; direction: ltr; }
+  .qr-tile {
+    width: 64%; aspect-ratio: 1; background: #fff; border-radius: 18px; padding: 4%;
+    position: relative; margin: 4% 0;
+    box-shadow: 0 0 0 4px rgba(233,185,73,.55), 0 20px 50px rgba(233,185,73,.18);
+  }
+  .qr-tile svg { width: 100%; height: 100%; display: block; }
+  .qr-center {
+    position: absolute; inset: 0; margin: auto; width: 20%; height: 20%;
+    border-radius: 50%; background: #fff; padding: 4px;
+  }
+  .qr-center img { width: 100%; height: 100%; display: block; border-radius: 50%; }
+  .p-wallets { display: flex; gap: 8px; justify-content: center; }
+  .p-wallets img { width: 26px; height: 26px; border-radius: 7px; }
+  .p-meta { font-size: 12px; color: #71717a; margin-top: 8px; direction: ltr; }
+  .p-url { font-size: 11px; color: #52525b; direction: ltr; word-break: break-all; margin-top: 2px; }
+
+  @media print {
+    @page { size: A5; margin: 0; }
+    body { background: #fff; }
+    .controls { display: none; }
+    .stage { padding: 0; }
+    .poster { max-width: none; width: 148mm; height: 210mm; aspect-ratio: auto; border-radius: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="controls">
+    <label for="url">آدرسی که QR به آن اشاره می‌کند (صفحه افزودن شبکه)</label>
+    <input id="url" type="url" spellcheck="false">
+    <div class="warn" id="warn" hidden>این صفحه هنوز روی اینترنت منتشر نشده. اول پوشه را روی یک هاست (مثل Netlify یا GitHub Pages) بگذارید و این صفحه را از همان آدرس باز کنید، یا آدرس نهایی را بالا وارد کنید.</div>
+    <div class="btns">
+      <button type="button" id="print">چاپ پوستر</button>
+      <button type="button" class="alt" id="png">دانلود QR (PNG)</button>
+      <button type="button" class="alt" id="svg">دانلود QR (SVG)</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="poster">
+      <div class="p-logo"><img src="logo.png" alt="DotOne"></div>
+      <div>
+        <div class="p-title">افزودن <span class="brand">DotOne Smart Chain</span></div>
+        <p class="p-sub">اسکن کنید، ولت خود را انتخاب کنید و شبکه را با یک تأیید اضافه کنید.</p>
+        <p class="p-sub-en">Scan · pick your wallet · add the network</p>
+      </div>
+      <div class="qr-tile">
+        <div id="qr"></div>
+        <div class="qr-center"><img src="logo.png" alt=""></div>
+      </div>
+      <div>
+        <div class="p-wallets" id="wallets"></div>
+        <div class="p-meta">Chain ID 505 · DOTO · dotscan.one</div>
+        <div class="p-url" id="urlText"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const input = $('url');
+  const defaultUrl = new URL('./', location.href).href;
+  input.value = new URLSearchParams(location.search).get('url') || defaultUrl;
+
+  // Same icons the landing page uses, shown small under the QR.
+  const walletIds = ['metamask', 'trust', 'coinbase', 'okx', 'bitget', 'tokenpocket', 'imtoken'];
+  fetch('index.html').then(r => r.text()).then(html => {
+    const m = html.match(/const ICONS = (\{[\s\S]*?\n  \});/);
+    if (!m) return;
+    const icons = Function('return ' + m[1])();
+    $('wallets').innerHTML = walletIds.filter(id => icons[id])
+      .map(id => `<img alt="" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(icons[id])}">`).join('');
+  }).catch(() => {});
+
+  let qr;
+  function render() {
+    const url = input.value.trim();
+    $('warn').hidden = /^https:\/\//i.test(url) && !/^https?:\/\/(localhost|127\.|\[::1\])/i.test(url);
+    qr = qrcode(0, 'H');
+    qr.addData(url);
+    qr.make();
+    $('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    $('urlText').textContent = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  }
+  input.addEventListener('input', render);
+  render();
+
+  function download(href, name) {
+    const a = document.createElement('a');
+    a.href = href; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  $('print').addEventListener('click', () => window.print());
+
+  $('svg').addEventListener('click', () => {
+    const svg = qr.createSvgTag({ cellSize: 10, margin: 4 });
+    download('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg), 'dotone-qr.svg');
+  });
+
+  $('png').addEventListener('click', () => {
+    const n = qr.getModuleCount(), quiet = 4, size = 1600;
+    const cell = Math.floor(size / (n + quiet * 2));
+    const dim = cell * (n + quiet * 2);
+    const c = document.createElement('canvas');
+    c.width = c.height = dim;
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, dim, dim);
+    g.fillStyle = '#000';
+    for (let r = 0; r < n; r++) for (let col = 0; col < n; col++)
+      if (qr.isDark(r, col)) g.fillRect((col + quiet) * cell, (r + quiet) * cell, cell, cell);
+
+    const finish = () => {
+      try { download(c.toDataURL('image/png'), 'dotone-qr.png'); }
+      catch (e) { alert('PNG export needs the page to be served over http(s).'); }
+    };
+    const img = new Image();
+    img.onload = () => {
+      const s = dim * 0.2, x = (dim - s) / 2;
+      g.fillStyle = '#fff';
+      g.beginPath(); g.arc(dim / 2, dim / 2, s / 2 + cell * 0.8, 0, Math.PI * 2); g.fill();
+      g.drawImage(img, x, x, s, s);
+      finish();
+    };
+    img.onerror = finish;
+    img.src = 'logo.png';
+  });
+})();
+</script>
+</body>
+</html>

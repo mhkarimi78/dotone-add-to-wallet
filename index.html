@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Add DotOne Chain</title>
+<meta name="description" content="DotOne Smart Chain را با یک تأیید به ولت خود اضافه کنید.">
+<meta name="theme-color" content="#0b0b0d">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0b0d;
+    --surface: #151518;
+    --surface-2: #1d1d21;
+    --border: #2a2a30;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    --gold-1: #f7d774;
+    --gold-2: #e9b949;
+    --gold-3: #c48f1f;
+    --gold-grad: linear-gradient(135deg, var(--gold-1), var(--gold-2) 50%, var(--gold-3));
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --err: #f87171;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background:
+      radial-gradient(120% 60% at 50% -10%, rgba(233,185,73,.18), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: "Vazirmatn", system-ui, -apple-system, "Segoe UI", sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 460px;
+    margin: 0 auto;
+    padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+  }
+  .topbar { display: flex; justify-content: flex-end; }
+  .lang {
+    background: var(--surface); color: var(--muted); border: 1px solid var(--border);
+    border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .hero { text-align: center; margin: 8px 0 26px; }
+  .logo-ring {
+    width: 84px; height: 84px; margin: 0 auto 16px; border-radius: 50%;
+    padding: 3px; background: var(--gold-grad);
+    box-shadow: 0 10px 40px rgba(233,185,73,.25);
+  }
+  .logo-ring img { width: 100%; height: 100%; border-radius: 50%; display: block; background: #000; }
+  h1 { font-size: 24px; font-weight: 800; margin: 0 0 8px; line-height: 1.4; }
+  h1 .brand {
+    background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+    unicode-bidi: isolate; direction: ltr; display: inline-block;
+  }
+  .sub { color: var(--muted); margin: 0; font-size: 15px; line-height: 1.8; }
+
+  .section-title { font-size: 14px; color: var(--muted); font-weight: 500; margin: 0 0 12px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .wallet {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px; color: var(--text); text-decoration: none; font-weight: 700; font-size: 15px;
+    position: relative; transition: border-color .15s, transform .1s, background .15s;
+    -webkit-tap-highlight-color: transparent; min-height: 64px; cursor: pointer;
+  }
+  .wallet:hover { border-color: #3a3a42; background: var(--surface-2); }
+  .wallet:active { transform: scale(.98); }
+  .wallet .ico { width: 36px; height: 36px; border-radius: 10px; overflow: hidden; flex: none; display: grid; place-items: center; }
+  .wallet .ico svg { width: 100%; height: 100%; display: block; }
+  .wallet .name { direction: ltr; unicode-bidi: isolate; line-height: 1.25; }
+  .wallet .badge {
+    position: absolute; top: -7px; inset-inline-start: 10px;
+    background: var(--ok); color: #052e12; font-size: 10px; font-weight: 800;
+    border-radius: 999px; padding: 2px 8px;
+  }
+  .wallet.other { grid-column: 1 / -1; justify-content: center; color: var(--muted); font-weight: 500; }
+  .wallet.other .ico { background: var(--surface-2); color: var(--gold-2); width: 28px; height: 28px; border-radius: 8px; }
+
+  .note {
+    margin-top: 14px; padding: 12px 14px; border-radius: 14px; font-size: 14px; line-height: 1.8;
+    background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.25); color: #fde68a;
+  }
+  .note a { color: var(--gold-1); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 22px;
+    padding: 22px; text-align: center;
+  }
+  .detected { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+  .detected .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px rgba(74,222,128,.15); }
+  .detected b { color: var(--text); direction: ltr; unicode-bidi: isolate; }
+  .btn-primary {
+    width: 100%; border: 0; border-radius: 16px; padding: 17px 18px;
+    background: var(--gold-grad); color: #1a1205; font: inherit; font-weight: 800; font-size: 17px;
+    cursor: pointer; box-shadow: 0 10px 30px rgba(233,185,73,.25); transition: transform .1s, opacity .15s;
+  }
+  .btn-primary:active { transform: scale(.985); }
+  .btn-primary[disabled] { opacity: .6; cursor: default; }
+  .btn-ghost {
+    background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px;
+    margin-top: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px;
+  }
+  .status { margin-top: 16px; font-size: 14px; line-height: 1.8; min-height: 1px; }
+  .status.pending { color: var(--warn); }
+  .status.err { color: var(--err); }
+  .spinner {
+    display: inline-block; width: 14px; height: 14px; vertical-align: -2px; margin-inline-end: 6px;
+    border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .success-ico {
+    width: 72px; height: 72px; border-radius: 50%; margin: 4px auto 14px;
+    background: rgba(74,222,128,.12); color: var(--ok); display: grid; place-items: center;
+  }
+  .success h2 { margin: 0 0 6px; font-size: 20px; }
+  .success p { margin: 0 0 18px; color: var(--muted); line-height: 1.8; }
+  .link-btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 11px 18px; border-radius: 12px;
+    border: 1px solid var(--border); color: var(--text); text-decoration: none; font-size: 14px; background: var(--surface-2);
+  }
+
+  details.manual { margin-top: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  details.manual summary {
+    list-style: none; cursor: pointer; padding: 15px 16px; font-weight: 700; font-size: 15px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  details.manual summary::-webkit-details-marker { display: none; }
+  details.manual summary .chev { transition: transform .2s; color: var(--muted); }
+  details.manual[open] summary .chev { transform: rotate(180deg); }
+  .manual-body { padding: 0 16px 14px; }
+  .manual-hint { color: var(--muted); font-size: 13px; line-height: 1.8; margin: 0 0 10px; }
+  .row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border);
+  }
+  .row .k { color: var(--muted); font-size: 13px; width: 92px; flex: none; }
+  .row .v {
+    flex: 1; min-width: 0; direction: ltr; text-align: left; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13.5px; overflow-wrap: anywhere;
+  }
+  .copy {
+    flex: none; background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 10px; padding: 6px 10px; font: inherit; font-size: 12px; cursor: pointer; min-width: 58px;
+  }
+  .copy.done { color: var(--ok); border-color: rgba(74,222,128,.4); }
+
+  footer { text-align: center; color: #71717a; font-size: 12px; margin-top: 26px; }
+  footer a { color: inherit; }
+  [hidden] { display: none !important; }
+
+  html[dir="ltr"] .row .k { width: 110px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><button class="lang" id="langBtn" type="button">EN</button></div>
+
+  <header class="hero">
+    <div class="logo-ring"><img src="logo.png" alt="DotOne"></div>
+    <h1><span data-i18n="h1a"></span> <span class="brand">DotOne Smart Chain</span></h1>
+    <p class="sub" data-i18n="sub"></p>
+  </header>
+
+  <!-- A: wallet picker -->
+  <section id="viewPick">
+    <p class="section-title" data-i18n="pick"></p>
+    <div class="grid" id="walletGrid"></div>
+    <div class="note" id="pickNote" hidden></div>
+  </section>
+
+  <!-- B: inside a wallet -->
+  <section id="viewAdd" hidden>
+    <div class="card">
+      <div class="detected"><span class="dot"></span><span data-i18n="detected"></span> <b id="detName"></b></div>
+      <button class="btn-primary" id="addBtn" type="button" data-i18n="addBtn"></button>
+      <div class="status" id="status" aria-live="polite"></div>
+      <button class="btn-ghost" id="backBtn" type="button" data-i18n="otherWallet"></button>
+    </div>
+  </section>
+
+  <!-- C: done -->
+  <section id="viewDone" hidden>
+    <div class="card success">
+      <div class="success-ico">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+      </div>
+      <h2 data-i18n="doneT"></h2>
+      <p data-i18n="doneD"></p>
+      <a class="link-btn" href="https://dotscan.one" target="_blank" rel="noopener"><span data-i18n="explorer"></span> ↗</a>
+    </div>
+  </section>
+
+  <details class="manual" id="manual">
+    <summary><span data-i18n="manualT"></span><span class="chev">▾</span></summary>
+    <div class="manual-body">
+      <p class="manual-hint" data-i18n="manualHint"></p>
+      <div id="rows"></div>
+    </div>
+  </details>
+
+  <footer>DotOne Smart Chain · Chain ID 505 · <a href="https://dotscan.one" target="_blank" rel="noopener">dotscan.one</a></footer>
+</div>
+
+<script>
+(() => {
+  // ---- Network: same values as the "Add DotOne Smart Chain" button on dotscan.one ----
+  const NETWORK = {
+    chainId: '0x1f9', // 505
+    chainName: 'DotOne Smart Chain',
+    nativeCurrency: { name: 'DotOne', symbol: 'DOTO', decimals: 18 },
+    rpcUrls: ['https://rpc.dotone.online/'],
+    blockExplorerUrls: ['https://dotscan.one'],
+  };
+
+  const ICONS = {
+    metamask: "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"><g clip-path=\"url(#metamask__a)\"><path fill=\"#fff\" d=\"M24 0H0v24h24z\"/><path fill=\"#FF5C16\" d=\"m18.9 18.925-3.434-.993-2.59 1.504h-1.807l-2.592-1.504-3.433.993L4 15.5l1.044-3.802L4 8.484 5.044 4.5l5.365 3.114h3.127L18.9 4.5l1.045 3.984-1.045 3.214 1.045 3.802z\"/><path fill=\"#FF5C16\" d=\"m5.045 4.5 5.364 3.116-.213 2.14zm3.433 11.001 2.36 1.747-2.36.684zm2.172-2.888-.454-2.856-2.904 1.942h-.001l.009 2 1.177-1.086zM18.9 4.5l-5.364 3.116.213 2.14zm-3.433 11.001-2.36 1.747 2.36.684zm1.187-3.801v-.002h-.001l-2.904-1.941-.453 2.856h2.171l1.178 1.086z\"/><path fill=\"#E34807\" d=\"m8.477 17.932-3.433.993L4 15.501h4.477zm2.172-5.32.656 4.13-.91-2.297-3.097-.746 1.178-1.087zm4.818 5.32 3.433.993 1.045-3.424h-4.478zm-2.171-5.32-.656 4.13.909-2.297 3.097-.746-1.179-1.087z\"/><path fill=\"#FF8D5D\" d=\"m4 15.5 1.044-3.802H7.29l.008 2 3.098.747.909 2.296-.468.505-2.36-1.747zm15.945 0L18.9 11.698h-2.245l-.009 2-3.097.747-.909 2.296.467.505 2.36-1.747zm-6.409-7.886h-3.127l-.213 2.139 1.109 6.985h1.335l1.11-6.985z\"/><path fill=\"#661800\" d=\"M5.044 4.5 4 8.484l1.044 3.214H7.29l2.905-1.943zM10 13.441H8.982l-.553.528 1.967.474zM18.9 4.5l1.045 3.984-1.045 3.214h-2.245l-2.906-1.943zm-4.954 8.941h1.02l.553.529-1.97.475zm-1.071 4.632.232-.825-.467-.506h-1.336l-.467.506.232.825\"/><path fill=\"#C0C4CD\" d=\"M12.875 18.073v1.364h-1.806v-1.364z\"/><path fill=\"#E7EBF6\" d=\"m8.478 17.93 2.592 1.506v-1.363l-.232-.826zm6.99 0-2.593 1.506v-1.363l.232-.826z\"/></g><defs><clipPath id=\"metamask__a\"><path fill=\"#fff\" d=\"M0 0h24v24H0z\"/></clipPath></defs></svg>",
+    trust: "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"><g clip-path=\"url(#trust__a)\"><path fill=\"#0500FF\" d=\"M24 0H0v24h24z\"/><path fill=\"#fff\" d=\"M4.8 6.311 12 4v16c-5.143-2.134-7.2-6.222-7.2-8.533zm14.4 0L12 4v16c5.143-2.134 7.2-6.222 7.2-8.533z\"/></g><defs><clipPath id=\"trust__a\"><path fill=\"#fff\" d=\"M0 0h24v24H0z\"/></clipPath></defs></svg>",
+    coinbase: "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"><g clip-path=\"url(#coinbase__a)\"><path fill=\"#0E5BFF\" d=\"M24 0H0v24h24z\"/><path fill=\"#fff\" d=\"M4 12a8 8 0 1 1 16 0 8 8 0 0 1-16 0\"/><path fill=\"#0E5BFF\" fill-rule=\"evenodd\" d=\"M12 17.667a5.667 5.667 0 1 0 0-11.334 5.667 5.667 0 0 0 0 11.334m-.667-7.334a1 1 0 0 0-1 1v1.334a1 1 0 0 0 1 1h1.334a1 1 0 0 0 1-1v-1.334a1 1 0 0 0-1-1z\" clip-rule=\"evenodd\"/></g><defs><clipPath id=\"coinbase__a\"><path fill=\"#fff\" d=\"M0 0h24v24H0z\"/></clipPath></defs></svg>",
+    okx: "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"><g clip-path=\"url(#okx__a)\"><path fill=\"#000\" d=\"M24 0H0v24h24z\"/><path fill=\"#fff\" d=\"M4 4h5.333v5.333H4zm10.667 5.333H9.333v5.334H4V20h5.333v-5.333h5.334V20H20v-5.333h-5.333zm0 0V4H20v5.333z\"/></g><defs><clipPath id=\"okx__a\"><path fill=\"#fff\" d=\"M0 0h24v24H0z\"/></clipPath></defs></svg>",
+    bitget: "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"><g clip-path=\"url(#bitget__a)\"><path fill=\"#00F0FF\" d=\"M24 0H0v24h24z\"/><path fill=\"#00040C\" d=\"M11.23 9.742h3.748l3.834 4.05c.25.263.25.69.003.956L13.898 20h-3.86l1.167-1.206 4.285-4.526-4.23-4.526\"/><path fill=\"#00040C\" d=\"M12.769 14.258H9.022L5.188 10.21a.706.706 0 0 1-.003-.956L10.102 4h3.86l-1.167 1.206L8.51 9.732l4.23 4.526\"/></g><defs><clipPath id=\"bitget__a\"><path fill=\"#fff\" d=\"M0 0h24v24H0z\"/></clipPath></defs></svg>",
+    tokenpocket: "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"><g clip-path=\"url(#token-pocket__a)\"><path fill=\"#2980FE\" d=\"M24 0H0v24h24z\"/><path fill=\"url(#token-pocket__b)\" d=\"M14.983 10.936v4.03q.17.036.337.06.247.036.495.038h.03v-3.207a.92.92 0 0 1-.862-.921\"/><path fill=\"#fff\" d=\"M14.984 10.936h-3.175v5.773c0 .272.217.491.487.491h2.194a.487.487 0 0 0 .486-.49v-5.774zM10.274 6.8H4.487A.49.49 0 0 0 4 7.29v2c0 .272.217.491.487.491H6.35v6.928c0 .272.217.491.487.491h2.081c.27 0 .487-.219.487-.49V9.78h.853c.816 0 1.483-.672 1.483-1.494A1.46 1.46 0 0 0 10.274 6.8\"/><path fill=\"#fff\" d=\"M15.912 6.8c-2.261 0-4.103 1.85-4.103 4.136a4.13 4.13 0 0 0 3.175 4.03v-4.03c0-.513.411-.928.92-.928s.922.415.922.928a.93.93 0 0 1-.929.928v3.2c.082 0 .157 0 .24-.007C18.293 14.928 20 13.132 20 10.928A4.097 4.097 0 0 0 15.912 6.8\"/><path fill=\"#fff\" d=\"M15.912 15.064v-3.2h-.067v3.208q.034-.01.067-.008\"/></g><defs><linearGradient id=\"token-pocket__b\" x1=\"15.911\" x2=\"14.986\" y1=\"12.999\" y2=\"12.999\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#fff\"/><stop offset=\".967\" stop-color=\"#DFDFDF\"/><stop offset=\"1\" stop-color=\"#fff\"/></linearGradient><clipPath id=\"token-pocket__a\"><path fill=\"#fff\" d=\"M0 0h24v24H0z\"/></clipPath></defs></svg>",
+    imtoken: "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"><g clip-path=\"url(#imtoken__a)\"><path fill=\"url(#imtoken__b)\" d=\"M24 0H0v24h24z\"/><path fill=\"#fff\" d=\"M19.958 6.784c.528 7.08-4.066 10.428-8.184 10.785-3.829.332-7.433-2-7.75-5.581-.26-2.96 1.586-4.219 3.036-4.344 1.491-.13 2.745.89 2.854 2.123.104 1.187-.643 1.726-1.162 1.771-.411.036-.928-.211-.975-.742-.04-.456.135-.518.092-1.002-.076-.863-.835-.963-1.25-.928-.504.044-1.416.626-1.288 2.074.129 1.462 1.543 2.616 3.397 2.456 2-.174 3.393-1.717 3.497-3.881q0-.174.072-.333V9.18a1 1 0 0 1 .076-.13q.063-.096.168-.21.001-.004.002-.003.077-.086.183-.186c.874-.817 4.021-2.744 6.998-2.134a.3.3 0 0 1 .234.267\"/></g><defs><linearGradient id=\"imtoken__b\" x1=\"18.35\" x2=\"6.424\" y1=\"9.072\" y2=\"15.899\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#0CC5FF\"/><stop offset=\"1\" stop-color=\"#007FFF\"/></linearGradient><clipPath id=\"imtoken__a\"><path fill=\"#fff\" d=\"M0 0h24v24H0z\"/></clipPath></defs></svg>",
+  };
+
+  const WALLETS = [
+    { id: 'metamask', name: 'MetaMask', rdns: ['io.metamask', 'io.metamask.mobile', 'io.metamask.flask'],
+      is: p => p.isMetaMask && !p.isTrust && !p.isTokenPocket && !p.isOkxWallet && !p.isBitKeep && !p.isRabby && !p.isBraveWallet,
+      link: u => 'https://metamask.app.link/dapp/' + u.replace(/^https?:\/\//, ''),
+      install: 'https://metamask.io/download/' },
+    { id: 'trust', name: 'Trust Wallet', rdns: ['com.trustwallet.app'],
+      is: p => p.isTrust || p.isTrustWallet,
+      link: u => 'https://link.trustwallet.com/open_url?coin_id=60&url=' + encodeURIComponent(u),
+      install: 'https://trustwallet.com/download' },
+    { id: 'coinbase', name: 'Coinbase Wallet', rdns: ['com.coinbase.wallet'],
+      is: p => p.isCoinbaseWallet || p.isCoinbaseBrowser,
+      link: u => 'https://go.cb-w.com/dapp?cb_url=' + encodeURIComponent(u),
+      install: 'https://www.coinbase.com/wallet/downloads' },
+    { id: 'okx', name: 'OKX Wallet', rdns: ['com.okex.wallet'],
+      is: p => p.isOkxWallet || p.isOKExWallet,
+      link: u => 'https://www.okx.com/download?deeplink=' + encodeURIComponent('okx://wallet/dapp/url?dappUrl=' + encodeURIComponent(u)),
+      install: 'https://www.okx.com/web3' },
+    { id: 'bitget', name: 'Bitget Wallet', rdns: ['com.bitget.web3'],
+      is: p => p.isBitKeep || p.isBitgetWallet,
+      link: u => 'https://bkcode.vip?action=dapp&url=' + encodeURIComponent(u),
+      install: 'https://web3.bitget.com/en/wallet-download' },
+    { id: 'tokenpocket', name: 'TokenPocket', rdns: ['pro.tokenpocket'],
+      is: p => p.isTokenPocket,
+      link: u => 'tpdapp://open?params=' + encodeURIComponent(JSON.stringify({ url: u, chain: 'ETH', source: 'DotOne' })),
+      install: 'https://www.tokenpocket.pro/en/download/app', scheme: true },
+    { id: 'imtoken', name: 'imToken', rdns: ['im.token'],
+      is: p => p.isImToken,
+      link: u => 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(u),
+      install: 'https://token.im/download', scheme: true },
+  ];
+
+  const T = {
+    fa: {
+      h1a: 'افزودن شبکه',
+      sub: 'ولت خود را انتخاب کنید تا شبکه با یک تأیید به آن اضافه شود.',
+      pick: 'ولت شما کدام است؟',
+      other: 'ولت دیگر / افزودن دستی',
+      found: 'نصب است',
+      detected: 'ولت شناسایی شد:',
+      yourWallet: 'ولت شما',
+      addBtn: 'افزودن DotOne به ولت',
+      otherWallet: 'انتخاب ولت دیگر',
+      pending: 'درخواست را در ولت خود تأیید کنید…',
+      rejected: 'درخواست لغو شد. برای تلاش دوباره روی دکمه بزنید.',
+      error: 'این ولت افزودن خودکار را پشتیبانی نکرد. اطلاعات پایین صفحه را دستی وارد کنید.',
+      noProvider: 'ولتی در این مرورگر پیدا نشد. ولت خود را از لیست انتخاب کنید.',
+      opening: 'در حال باز کردن {w}…',
+      notOpened: '{w} باز نشد؟ ابتدا <a href="{i}" target="_blank" rel="noopener">اپ را نصب کنید</a> و دوباره QR را اسکن کنید.',
+      desktopNo: 'افزونه {w} روی این مرورگر نصب نیست. QR را با گوشی اسکن کنید یا <a href="{i}" target="_blank" rel="noopener">افزونه را نصب کنید</a>.',
+      doneT: 'شبکه اضافه شد',
+      doneD: 'DotOne Smart Chain حالا در ولت شما فعال است.',
+      explorer: 'مشاهده در DotScan',
+      manualT: 'اطلاعات شبکه (افزودن دستی)',
+      manualHint: 'در ولت به بخش «افزودن شبکه» یا Add Network بروید و این مقادیر را وارد کنید.',
+      kName: 'نام شبکه', kRpc: 'آدرس RPC', kId: 'Chain ID', kSym: 'نماد ارز', kExp: 'اکسپلورر',
+      copy: 'کپی', copied: 'کپی شد ✓',
+      lang: 'EN',
+    },
+    en: {
+      h1a: 'Add',
+      sub: 'Pick your wallet and the network is added with a single confirmation.',
+      pick: 'Which wallet do you use?',
+      other: 'Other wallet / add manually',
+      found: 'Installed',
+      detected: 'Wallet detected:',
+      yourWallet: 'Your wallet',
+      addBtn: 'Add DotOne to wallet',
+      otherWallet: 'Choose a different wallet',
+      pending: 'Confirm the request in your wallet…',
+      rejected: 'Request cancelled. Tap the button to try again.',
+      error: "This wallet didn't accept the automatic request. Enter the details below manually.",
+      noProvider: 'No wallet found in this browser. Pick your wallet from the list.',
+      opening: 'Opening {w}…',
+      notOpened: '{w} didn\'t open? <a href="{i}" target="_blank" rel="noopener">Install the app</a> first, then scan the QR again.',
+      desktopNo: '{w} extension isn\'t installed in this browser. Scan the QR with your phone, or <a href="{i}" target="_blank" rel="noopener">install the extension</a>.',
+      doneT: 'Network added',
+      doneD: 'DotOne Smart Chain is now available in your wallet.',
+      explorer: 'Open DotScan',
+      manualT: 'Network details (manual setup)',
+      manualHint: 'In your wallet, open "Add Network" and enter these values.',
+      kName: 'Network name', kRpc: 'RPC URL', kId: 'Chain ID', kSym: 'Currency symbol', kExp: 'Block explorer',
+      copy: 'Copy', copied: 'Copied ✓',
+      lang: 'فا',
+    },
+  };
+
+  const $ = id => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  const fromWallet = params.get('w');
+  const ua = navigator.userAgent;
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+
+  let lang = 'fa';
+  try { lang = localStorage.getItem('dotone-lang') || (params.get('lang') === 'en' ? 'en' : 'fa'); } catch (e) {}
+  const t = (k, vars = {}) => T[lang][k].replace(/\{(\w)\}/g, (_, v) => vars[v] ?? '');
+
+  // ---- Provider discovery (EIP-6963 + legacy window.ethereum) ----
+  const announced = [];
+  window.addEventListener('eip6963:announceProvider', e => {
+    const d = e.detail;
+    if (d && d.provider && !announced.some(a => a.info.uuid === d.info.uuid)) announced.push(d);
+  });
+  window.dispatchEvent(new Event('eip6963:requestProvider'));
+
+  function legacyProviders() {
+    const eth = window.ethereum;
+    if (!eth) return [];
+    return Array.isArray(eth.providers) && eth.providers.length ? eth.providers : [eth];
+  }
+
+  function findProvider(wallet) {
+    const a = announced.find(x => wallet.rdns.includes(x.info.rdns));
+    if (a) return { provider: a.provider, name: a.info.name || wallet.name };
+    const p = legacyProviders().find(p => { try { return wallet.is(p); } catch (e) { return false; } });
+    return p ? { provider: p, name: wallet.name } : null;
+  }
+
+  function anyProvider() {
+    const pref = fromWallet && WALLETS.find(w => w.id === fromWallet);
+    if (pref) { const m = findProvider(pref); if (m) return m; }
+    for (const w of WALLETS) { const m = findProvider(w); if (m) return m; }
+    if (announced.length) return { provider: announced[0].provider, name: announced[0].info.name };
+    const eth = window.ethereum;
+    return eth ? { provider: eth, name: null } : null;
+  }
+
+  function waitForProvider(ms) {
+    return new Promise(resolve => {
+      const start = Date.now();
+      const done = () => { window.removeEventListener('ethereum#initialized', tick); resolve(); };
+      const tick = () => {
+        if (window.ethereum || announced.length) return done();
+        if (Date.now() - start >= ms) return done();
+        setTimeout(tick, 100);
+      };
+      window.addEventListener('ethereum#initialized', tick, { once: true });
+      tick();
+    });
+  }
+
+  // ---- Views ----
+  let active = null; // { provider, name }
+  let busy = false;
+
+  function show(view) {
+    $('viewPick').hidden = view !== 'pick';
+    $('viewAdd').hidden = view !== 'add';
+    $('viewDone').hidden = view !== 'done';
+  }
+
+  function setStatus(kind, msg) {
+    const el = $('status');
+    el.className = 'status ' + (kind || '');
+    el.innerHTML = kind === 'pending' ? '<span class="spinner"></span>' + msg : (msg || '');
+  }
+
+  function pickNote(html) {
+    const n = $('pickNote');
+    n.innerHTML = html || '';
+    n.hidden = !html;
+  }
+
+  function enterAdd(match, auto) {
+    active = match;
+    $('detName').textContent = match.name || t('yourWallet');
+    setStatus('', '');
+    show('add');
+    if (auto) setTimeout(addNetwork, 500);
+  }
+
+  async function addNetwork(retried) {
+    if (!active || busy) return;
+    busy = true;
+    $('addBtn').disabled = true;
+    setStatus('pending', t('pending'));
+    try {
+      await active.provider.request({ method: 'wallet_addEthereumChain', params: [NETWORK] });
+      show('done');
+    } catch (e) {
+      const code = e && (e.code ?? e.data?.originalError?.code);
+      if (code === 4100 && !retried) {
+        // Some wallets want a connection before accepting network requests.
+        try {
+          await active.provider.request({ method: 'eth_requestAccounts' });
+          busy = false;
+          await addNetwork(true);
+          return;
+        } catch (e2) { /* fall through */ }
+      }
+      if (code === 4001) setStatus('err', t('rejected'));
+      else { setStatus('err', t('error')); $('manual').open = true; }
+    } finally {
+      busy = false;
+      $('addBtn').disabled = false;
+    }
+  }
+
+  function dappUrl(id) {
+    const u = new URL(location.href);
+    u.hash = '';
+    u.search = '';
+    u.searchParams.set('w', id);
+    if (lang === 'en') u.searchParams.set('lang', 'en');
+    return u.toString();
+  }
+
+  function renderWallets() {
+    const grid = $('walletGrid');
+    grid.innerHTML = '';
+    for (const w of WALLETS) {
+      const a = document.createElement('a');
+      a.className = 'wallet';
+      a.href = isMobile ? w.link(dappUrl(w.id)) : '#';
+      a.innerHTML = `<span class="ico">${ICONS[w.id] || ''}</span><span class="name">${w.name}</span>`;
+      if (!isMobile && findProvider(w)) {
+        const b = document.createElement('span');
+        b.className = 'badge';
+        b.textContent = t('found');
+        a.appendChild(b);
+      }
+      a.addEventListener('click', ev => onWallet(ev, w));
+      grid.appendChild(a);
+    }
+    const o = document.createElement('button');
+    o.type = 'button';
+    o.className = 'wallet other';
+    o.innerHTML = `<span class="ico">＋</span><span>${t('other')}</span>`;
+    o.addEventListener('click', () => {
+      const m = $('manual');
+      m.open = true;
+      m.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    grid.appendChild(o);
+  }
+
+  function onWallet(ev, w) {
+    const match = findProvider(w);
+    if (match) { // the wallet is right here (extension, or we're inside its browser)
+      ev.preventDefault();
+      enterAdd(match, true);
+      return;
+    }
+    if (!isMobile) {
+      ev.preventDefault();
+      pickNote(t('desktopNo', { w: w.name, i: w.install }));
+      return;
+    }
+    // Mobile: let the anchor open the wallet's in-app browser. If we're still here, it likely isn't installed.
+    pickNote(t('opening', { w: w.name }));
+    let left = false;
+    const onHide = () => { left = true; };
+    document.addEventListener('visibilitychange', onHide, { once: true });
+    window.addEventListener('pagehide', onHide, { once: true });
+    setTimeout(() => {
+      if (!left && document.visibilityState === 'visible') pickNote(t('notOpened', { w: w.name, i: w.install }));
+    }, w.scheme ? 1800 : 3000);
+  }
+
+  function renderRows() {
+    const rows = [
+      ['kName', NETWORK.chainName],
+      ['kRpc', NETWORK.rpcUrls[0]],
+      ['kId', String(parseInt(NETWORK.chainId, 16))],
+      ['kSym', NETWORK.nativeCurrency.symbol],
+      ['kExp', NETWORK.blockExplorerUrls[0]],
+    ];
+    const box = $('rows');
+    box.innerHTML = '';
+    for (const [k, v] of rows) {
+      const r = document.createElement('div');
+      r.className = 'row';
+      r.innerHTML = `<span class="k">${t(k)}</span><span class="v"></span><button class="copy" type="button">${t('copy')}</button>`;
+      r.querySelector('.v').textContent = v;
+      const btn = r.querySelector('.copy');
+      btn.addEventListener('click', () => copy(v, btn));
+      box.appendChild(r);
+    }
+  }
+
+  async function copy(text, btn) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e2) {}
+      ta.remove();
+    }
+    btn.textContent = t('copied');
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = t('copy'); btn.classList.remove('done'); }, 1600);
+  }
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    $('langBtn').textContent = t('lang');
+    if (active) $('detName').textContent = active.name || t('yourWallet');
+    renderWallets();
+    renderRows();
+    pickNote('');
+    if (!$('viewAdd').hidden && $('status').textContent) setStatus('', '');
+  }
+
+  $('langBtn').addEventListener('click', () => {
+    lang = lang === 'fa' ? 'en' : 'fa';
+    try { localStorage.setItem('dotone-lang', lang); } catch (e) {}
+    applyLang();
+  });
+  $('addBtn').addEventListener('click', () => addNetwork());
+  $('backBtn').addEventListener('click', () => { active = null; show('pick'); });
+
+  applyLang();
+  show('pick');
+
+  waitForProvider(fromWallet ? 2000 : 800).then(() => {
+    renderWallets(); // refresh "installed" badges
+    const match = anyProvider();
+    if (match && (isMobile || fromWallet)) enterAdd(match, Boolean(fromWallet));
+    else if (fromWallet) pickNote(t('noProvider'));
+  });
+})();
+</script>
+</body>
+</html>
